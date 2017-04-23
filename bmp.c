@@ -1,5 +1,7 @@
 #include "aok.h"
 
+int bmpres = 2835;	// 72dpi
+
 void
 BmpWriteHeader(int width, int height, int depth, FILE *f)
 {
@@ -28,8 +30,8 @@ BmpWriteHeader(int width, int height, int depth, FILE *f)
 	*(short*)p = depth; p += 2;
 	*(int*)p = 0; p += 4;       // compression: none
 	*(int*)p = 0; p += 4;        // size, not needed in our case
-	*(int*)p = 2835; p += 4;     // x resolution, 72dpi
-	*(int*)p = 2835; p += 4;     // y resolution
+	*(int*)p = bmpres; p += 4;     // x resolution
+	*(int*)p = bmpres; p += 4;     // y resolution
 	*(int*)p = 0; p += 4;        // number of used palette colors: max
 	*(int*)p = 0; p += 4;        // important pixels
 
