@@ -9,6 +9,8 @@ ShapeCreate(uchar *data)
 	slp = malloc(sizeof(Shape));
 	slp->header = (SlpHeader*)data;
 	slp->frames = (SlpFrame*)(slp->header+1);
+	slp->numFrames = slp->header->numFrames;
+	slp->size = 0;	// only used for writing, set manually if needed
 	return slp;
 }
 
@@ -74,6 +76,105 @@ ShapeClipTest(Shape *slp, int n, Surface *s, int xoff, int yoff)
 }
 
 #define INSIDE(x, a, b) ((x) >= (a) && (x) < (b))
+
+void
+ShapeForallPixels(Shape *slp, PixelCB cb)
+{
+	short *out;
+	uchar *cmd;
+	uchar c;
+	int npx;
+	int y;
+	SlpFrame *frm;
+	int n;
+
+	for(n = 0; n < slp->numFrames; n++){
+	frm = &slp->frames[n];
+	out = ShapeGetOutlineTbl(slp, n);
+	cmd = ShapeGetCommand(slp, *ShapeGetCommandTbl(slp, n));
+	for(y = 0; y < frm->height; y++){
+		for(;;){
+			switch(*cmd & 0x3){
+			case 0x0:	/* small block */
+				npx = *cmd++ >> 2;
+				while(npx--){
+					*cmd = cb(*cmd);
+					cmd++;
+				}
+				break;
+			case 0x1:	/* small skip */
+				npx = *cmd++ >> 2;
+				break;
+			default:
+				switch(*cmd & 0xF){
+				case 0x2:	/* block */
+					npx = (int)(*cmd++ & 0xF0) << 4;
+					npx |= *cmd++;
+					while(npx--){
+						*cmd = cb(*cmd);
+						cmd++;
+					}
+					break;
+				case 0x3:	/* skip */
+					npx = (int)(*cmd++ & 0xF0) << 4;
+					npx |= *cmd++;
+					break;
+				case 0x6:	/* player block */
+					npx = *cmd++ >> 4;
+					if(npx == 0) npx = *cmd++;
+					while(npx--){
+						cmd++;
+					}
+					break;
+				case 0x7:	/* fill */
+					npx = *cmd++ >> 4;
+					if(npx == 0) npx = *cmd++;
+					*cmd = cb(*cmd);
+					cmd++;
+					break;
+				case 0xA:	/* player fill */
+					npx = *cmd++ >> 4;
+					if(npx == 0) npx = *cmd++;
+					c = *cmd++ + (gCurPlayerColor<<4);
+					break;
+				case 0xB:	/* shadow fill ?? */
+					npx = *cmd++ >> 4;
+					if(npx == 0) npx = *cmd++;
+					cmd++;
+					break;
+				case 0xF:	/* end of line */
+					cmd++;
+					goto endofline;
+				case 0xE:	/* extended */
+					switch(*cmd++ >> 4){
+					case 0x0:	/* next only if not flipped */
+						break;
+					case 0x1:	/* next only if flipped */
+						break;
+					case 0x2:	/* set normal color transform */
+						break;
+					case 0x3:	/* set alternate color transform */
+						break;
+					case 0x4:	/* one outline player */
+						break;
+					case 0x5:	/* outline player */
+						cmd++;
+						break;
+					case 0x6:	/* one outline black */
+						break;
+					case 0x7:	/* outline black */
+						cmd++;
+						break;
+					}
+				}
+				break;
+			}
+		}
+	endofline:;
+		out += 2;
+	}
+	}
+}
 
 /* TODO: This could be optimized a lot by skipping clip tests if possible */
 void

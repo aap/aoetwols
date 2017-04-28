@@ -81,6 +81,8 @@ RgbOnlySaturation(RGB rgb)
 #define HEIGHT (32*32)
 #define STRIDE BmpGetStride(WIDTH, DEPTH)
 
+/* usage: mkicm palette.pal view_icm.dat >view_icm.bmp */
+
 int
 main(int argc, char *argv[])
 {
