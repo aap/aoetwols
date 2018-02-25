@@ -9,6 +9,11 @@ MapInit(Map *map)
 	for(t = map->terrain; t < &map->terrain[NUMTERRAINS]; t++){
 		if(!t->enabled)
 			continue;
+		if (t->resource_id < 0) {
+			printf("terrain %s has invalid resource id, defaulting to dirt\n",
+					t->name);
+			t->resource_id = 15000;
+		}
 		t->shape = ShapeCreate(DrsLoadFile(DrsSlp, t->resource_id));
 		assert(t->shape);
 	}
@@ -94,3 +99,5 @@ MapValidCoord(Map *map, int x, int y)
 	return x >= 0 && x < map->width &&
 	       y >= 0 && y < map->height;
 }
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/

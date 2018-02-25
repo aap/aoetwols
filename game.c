@@ -64,7 +64,7 @@ mouse(int button, int state, int x, int y)
 	int diffX, diffY;
 	diffX = x - lastMouseX;
 	diffY = y - lastMouseY;
-	if(state & 2){
+	if(state & 1){
 		offx += diffX;
 		offy += diffY;
 	}
@@ -111,3 +111,5 @@ GameMainLoop(Game *game)
 	SDL_DestroyWindow(game->window);
 	SDL_Quit();  
 }
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/

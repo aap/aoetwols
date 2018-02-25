@@ -64,6 +64,9 @@ DrsLoadFile(uint type, int id)
 		fread(data, 1, f->size, drs->file);
 		return data;
 	}
+
+	printf("failed to find %d in drs\n", id);
+
 	return nil;
 }
 
@@ -96,3 +99,5 @@ DrsDump(Drs *drs)
 		}
 	}
 }
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/

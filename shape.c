@@ -6,7 +6,14 @@ Shape*
 ShapeCreate(uchar *data)
 {
 	Shape *slp;
+
+	if (!data) {
+		printf("given nullpointer\n");
+		return NULL;
+	}
+
 	slp = malloc(sizeof(Shape));
+
 	slp->header = (SlpHeader*)data;
 	slp->frames = (SlpFrame*)(slp->header+1);
 	slp->numFrames = slp->header->numFrames;
@@ -362,3 +369,5 @@ ShapeDumpFrame(const char *path, Palette *pal, Shape *slp, int n)
 	fclose(f);
 	free(s.data);
 }
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/

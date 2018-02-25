@@ -654,3 +654,5 @@ ViewLoadFiles(View *view)
 	view->tmpFlatTile = ShapeCreateFromTemplate(view->stemplet[0]);
 	ViewInitBlendMaps(view);
 }
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/

@@ -407,7 +407,7 @@ struct TerrainSlopeInfo
 struct Terrain
 {
 	uchar enabled;
-	uchar unk0;
+	uchar random;
 	char name[13];
 	char filename[13];
 	int resource_id;
@@ -665,3 +665,5 @@ struct View
 };
 void ViewLoadFiles(View*);
 void ViewDraw(View *view, int xoff, int yoff);
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/
