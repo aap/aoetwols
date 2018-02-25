@@ -362,3 +362,5 @@ ShapeDumpFrame(const char *path, Palette *pal, Shape *slp, int n)
 	fclose(f);
 	free(s.data);
 }
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/

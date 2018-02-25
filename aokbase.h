@@ -665,3 +665,5 @@ struct View
 };
 void ViewLoadFiles(View*);
 void ViewDraw(View *view, int xoff, int yoff);
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/
