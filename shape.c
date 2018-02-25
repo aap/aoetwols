@@ -6,7 +6,14 @@ Shape*
 ShapeCreate(uchar *data)
 {
 	Shape *slp;
+
+	if (!data) {
+		printf("given nullpointer\n");
+		return NULL;
+	}
+
 	slp = malloc(sizeof(Shape));
+
 	slp->header = (SlpHeader*)data;
 	slp->frames = (SlpFrame*)(slp->header+1);
 	slp->numFrames = slp->header->numFrames;
