@@ -407,7 +407,7 @@ struct TerrainSlopeInfo
 struct Terrain
 {
 	uchar enabled;
-	uchar unk0;
+	uchar random;
 	char name[13];
 	char filename[13];
 	int resource_id;

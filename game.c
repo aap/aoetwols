@@ -111,3 +111,5 @@ GameMainLoop(Game *game)
 	SDL_DestroyWindow(game->window);
 	SDL_Quit();  
 }
+
+/* vim: set ts=8 sw=8 tw=0 noexpandtab cindent softtabstop=8 :*/
