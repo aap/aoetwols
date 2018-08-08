@@ -400,6 +400,18 @@ ViewDrawTile(View *view, int tilex, int tiley, int xoff, int yoff)
 		case SLOPE_NE_UP:
 			numpatterns = ViewLightSlope_NE_UP(view, slopes, patterns);
 			break;
+		case SLOPE_SWE_UP:
+			numpatterns = ViewLightSlope_SWE_UP(view, slopes, patterns);
+			break;
+		case SLOPE_NWE_UP:
+			numpatterns = ViewLightSlope_NWE_UP(view, slopes, patterns);
+			break;
+		case SLOPE_NSE_UP:
+			numpatterns = ViewLightSlope_NSE_UP(view, slopes, patterns);
+			break;
+		case SLOPE_NSW_UP:
+			numpatterns = ViewLightSlope_NSW_UP(view, slopes, patterns);
+			break;
 		}
 
 		ViewFilterTile(view, view->filtermaps[slope],

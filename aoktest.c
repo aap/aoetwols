@@ -165,7 +165,6 @@ main(int argc, char *argv[])
 //		printf("tile %2d: %5d\n", i, map->tileSize[i].z);
 //	fflush(stdout);
 
-
 	MapInit(map);
 	MapNew(map, 20, 20);
 	MapSetElev(map, 7, 7, 2);
@@ -189,7 +188,6 @@ main(int argc, char *argv[])
 
 //	slopetest(&view, slp);
 //	SlpDumpFrame("data/tools/test.bmp", &view.mainPalette, slp, 0);
-
 	GameMainLoop(&gGame);
 
 	return 0;

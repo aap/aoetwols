@@ -5,11 +5,15 @@ MapInit(Map *map)
 {
 	int i;
 	Terrain *t;
+	uchar *data;
 
 	for(t = map->terrain; t < &map->terrain[NUMTERRAINS]; t++){
 		if(!t->enabled)
 			continue;
-		t->shape = ShapeCreate(DrsLoadFile(DrsSlp, t->resource_id));
+		printf("%d\n", t->resource_id);
+		data = DrsLoadFile(DrsSlp, t->resource_id);
+		assert(data);
+		t->shape = ShapeCreate(data);
 		assert(t->shape);
 	}
 
