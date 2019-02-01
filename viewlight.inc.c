@@ -103,7 +103,7 @@ ViewLightSlope_E_UP(View *view, int *slopes, int *patterns)
 	else if(FLAT(slopes[TILE_S]))
 		patterns[n++] = 37;
 	if(!(FLAT(slopes[TILE_NW]) || N_OR_W_UP(slopes[TILE_NW]))){
-		if(!FLAT(slopes[TILE_N]))
+		if(FLAT(slopes[TILE_N]))
 			patterns[n++] = 36;
 	}else
 		patterns[n++] = 8;
