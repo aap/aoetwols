@@ -25,6 +25,10 @@ typedef struct DrsHeader DrsHeader;
 typedef struct DrsTable DrsTable;
 typedef struct DrsFile DrsFile;
 typedef struct Shape Shape;
+typedef struct OldShape OldShape;
+typedef struct ShpFileHeader ShpFileHeader;
+typedef struct ShpFrame ShpFrame;
+typedef struct ShpOffsets ShpOffsets;
 typedef struct SlpHeader SlpHeader;
 typedef struct SlpFrame SlpFrame;
 typedef struct SlpTemplate SlpTemplate;
@@ -144,6 +148,36 @@ enum {
 	DrsWav = 0x77617620,	// 'wav '
 };
 
+struct ShpFileHeader
+{
+	char version[4];
+	int numShapes;
+};
+
+struct ShpFrame
+{
+	short bounds_height;
+	short bounds_width;
+	short origin_y;
+	short origin_x;
+	int xmin;
+	int ymin;
+	int xmax;
+	int ymax;
+};
+
+struct ShpOffsets
+{
+	int shapeOff;
+	int palOff;
+};
+
+struct OldShape
+{
+	ShpFileHeader *header;
+	ShpOffsets *offsets;
+};
+
 struct SlpHeader
 {
 	char version[4];
@@ -177,10 +211,14 @@ struct Shape
 
 typedef uchar PixelCB(uchar);
 
+OldShape *OldShapeCreate(uchar *data);
+void OldShapeDrawFrame(ShpFrame *frm, Surface *s, int xoff, int yoff);
+void OldShapeDumpFrame(const char *path, Palette *pal, OldShape *shp, int n, uchar *colmap);
+void OldShapeDrawFrameColorMap(ShpFrame *frm, Surface *s, int xoff, int yoff, uchar *map);
+
 Shape *ShapeCreate(uchar *data);
 Shape *ShapeCreateFromTemplate(SlpTemplate *templ);
 void ShapeDump(Shape *slp);
-//void SlpDrawFrame(Shape *slp, int n, uchar *data, int stride);
 void ShapeDrawFrame(Shape *slp, int n, Surface *s, int x, int y);
 void ShapeDrawArea(Shape *slp, int n, uchar *data, int stride);
 void ShapeDumpFrame(const char *path, Palette *pal, Shape *slp, int n);

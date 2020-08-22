@@ -14,6 +14,16 @@ ShapeCreate(uchar *data)
 	return slp;
 }
 
+OldShape*
+OldShapeCreate(uchar *data)
+{
+	OldShape *shp;
+	shp = malloc(sizeof(OldShape));
+	shp->header = (ShpFileHeader*)data;
+	shp->offsets = (ShpOffsets*)(shp->header+1);
+	return shp;
+}
+
 Shape*
 ShapeCreateFromTemplate(SlpTemplate *templ)
 {
@@ -173,6 +183,85 @@ ShapeForallPixels(Shape *slp, PixelCB cb)
 	endofline:;
 		out += 2;
 	}
+	}
+}
+
+void
+OldShapeDrawFrame(ShpFrame *frm, Surface *s, int xoff, int yoff)
+{
+	uchar cmd;
+	uchar *data;
+	uchar *lp;
+	int n;
+
+	data = (uchar*)&frm[1];
+
+	xoff += frm->xmin;
+	yoff += frm->ymin;
+
+	int height = frm->ymax - frm->ymin + 1;
+
+	for (int y = 0; y < height; y++){
+		lp = s->data + (y+yoff)*s->stride + xoff;
+		for(;;){
+			cmd = *data++;
+			n = cmd >> 1;
+			if (cmd & 1){
+				if (n){
+					memcpy(lp, data, n);
+					lp += n;
+					data += n;
+				}else{
+					lp += *data++;
+				}
+			}else{
+				if (n){
+					memset(lp, *data++, n);
+					lp += n;
+				}else{
+					break;
+				}
+			}
+		}
+	}
+}
+
+void
+OldShapeDrawFrameColorMap(ShpFrame *frm, Surface *s, int xoff, int yoff, uchar *map)
+{
+	uchar cmd;
+	uchar *data;
+	uchar *lp;
+	int n;
+
+	data = (uchar*)&frm[1];
+
+	xoff += frm->xmin;
+	yoff += frm->ymin;
+
+	int height = frm->ymax - frm->ymin + 1;
+
+	for (int y = 0; y < height; y++){
+		lp = s->data + (y+yoff)*s->stride + xoff;
+		for(;;){
+			cmd = *data++;
+			n = cmd >> 1;
+			if (cmd & 1){
+				if (n){
+					while (n--)
+						*lp++ = map[*data++];
+				}else{
+					lp += *data++;
+				}
+			}else{
+				if (n){
+					memset(lp, map[*data++], n);
+					lp += n;
+				}else{
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -338,6 +427,36 @@ ShapeDrawArea(Shape *slp, int n, uchar *data, int stride)
 }
 
 void
+OldShapeDumpFrame(const char *path, Palette *pal, OldShape *shp, int n, uchar *colmap)
+{
+	FILE *f;
+	ShpFrame *frm;
+	Surface s;
+	uchar *data = (uchar*)shp->header;
+
+	frm = (ShpFrame*)&data[shp->offsets[n].shapeOff];
+
+	s.width = frm->bounds_width;
+	s.height = frm->bounds_height;
+	s.stride = BmpGetStride(s.width, 8);
+	s.data = malloc(s.height*s.stride);
+	memset(s.data, 0, s.height*s.stride);
+
+	if (colmap)
+		OldShapeDrawFrameColorMap(frm, &s, frm->origin_x, frm->origin_y, colmap);
+	else
+		OldShapeDrawFrame(frm, &s, frm->origin_x, frm->origin_y);
+
+	f = mustopen(path, "wb");
+	BmpWriteHeader(s.width, s.height, 8, f);
+	BmpWritePalette(pal, f);
+	BmpFlipVert(s.width, s.height, 8, s.data);
+	fwrite(s.data, 1, s.height*s.stride, f);
+	fclose(f);
+	free(s.data);
+}
+
+void
 ShapeDumpFrame(const char *path, Palette *pal, Shape *slp, int n)
 {
 	FILE *f;
@@ -352,7 +471,7 @@ ShapeDumpFrame(const char *path, Palette *pal, Shape *slp, int n)
 	memset(s.data, 0, s.height*s.stride);
 
 //	ShapeDrawArea(slp, n, data, stride);
-	ShapeDrawFrame(slp, n, &s, 0, 0);
+	ShapeDrawFrame(slp, n, &s, frm->centerX, frm->centerY);
 
 	f = mustopen(path, "wb");
 	BmpWriteHeader(s.width, s.height, 8, f);
