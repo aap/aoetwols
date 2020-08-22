@@ -24,6 +24,10 @@ typedef struct Drs Drs;
 typedef struct DrsHeader DrsHeader;
 typedef struct DrsTable DrsTable;
 typedef struct DrsFile DrsFile;
+typedef struct OldDrs OldDrs;
+typedef struct OldDrsHeader OldDrsHeader;
+typedef struct OldDrsTable OldDrsTable;
+typedef struct OldDrsFile OldDrsFile;
 typedef struct Shape Shape;
 typedef struct OldShape OldShape;
 typedef struct ShpFileHeader ShpFileHeader;
@@ -105,6 +109,35 @@ uchar *getFileContents(const char *path, int *length);
 		fprintf(stderr, "need %d args\n", _n_);\
 		exit(1);\
 	}
+
+struct OldDrs
+{
+	OldDrsHeader *header;
+	OldDrsTable *tables;
+	FILE *f;
+};
+
+struct OldDrsHeader
+{
+	char comment[40];
+	int idMin;
+	int idMax;
+	int numFiles;
+};
+
+struct OldDrsTable
+{
+	uint type;
+	int id;
+	int offset;
+};
+
+struct OldDrsFile
+{
+	uint type;
+	int id;
+	int len;
+};
 
 struct DrsHeader
 {
