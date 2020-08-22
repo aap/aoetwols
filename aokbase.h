@@ -696,7 +696,7 @@ struct View
 	Blendmode blend_modes[9];
 	int baseTileLineWidth[49];
 	int *blendInflBits;
-	char (*blendInflMap)[4];
+	uchar (*blendInflMap)[4];
 	Shape *tmpFlatTile;
 
 	Palette mainPalette;

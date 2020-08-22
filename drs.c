@@ -20,7 +20,7 @@ DrsOpen(const char *path)
 	drs->header = (DrsHeader*)header;
 	drs->tables = (DrsTable*)(drs->header+1);
 	drs->file = f;
-	drs->next = NULL;
+	drs->next = nil;
 	for(i = &gResourceList; *i; i = &(*i)->next);
 	*i = drs;
 	return drs;

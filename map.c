@@ -8,7 +8,7 @@ MapInit(Map *map)
 	uchar *data;
 
 	for(t = map->terrain; t < &map->terrain[NUMTERRAINS]; t++){
-		if(!t->enabled)
+		if(!t->enabled || t->resource_id == -1)
 			continue;
 		printf("%d\n", t->resource_id);
 		data = DrsLoadFile(DrsSlp, t->resource_id);

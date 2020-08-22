@@ -163,7 +163,7 @@ ViewBlendTile(View *view, Shape *dst, int dstfrm,
 {
 	int i;
 	int x, y;
-	char *maps;
+	uchar *maps;
 	Blendmode *bm;
 	int nummasks;
 	uchar *masks[4];
@@ -178,7 +178,7 @@ ViewBlendTile(View *view, Shape *dst, int dstfrm,
 	bm = &view->blend_modes[mode];
 	nummasks = 0;
 	for(i = 0; i < 4; i++){
-		if(maps[i] != -1){
+		if(maps[i] != (uchar)0xFF){
 			if(maps[i] < 16)
 				masks[nummasks++] = bm->tilealpha[maps[i]+variation];
 			else
