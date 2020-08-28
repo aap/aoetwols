@@ -24,7 +24,15 @@ typedef struct Drs Drs;
 typedef struct DrsHeader DrsHeader;
 typedef struct DrsTable DrsTable;
 typedef struct DrsFile DrsFile;
+typedef struct OldDrs OldDrs;
+typedef struct OldDrsHeader OldDrsHeader;
+typedef struct OldDrsTable OldDrsTable;
+typedef struct OldDrsFile OldDrsFile;
 typedef struct Shape Shape;
+typedef struct OldShape OldShape;
+typedef struct ShpFileHeader ShpFileHeader;
+typedef struct ShpFrame ShpFrame;
+typedef struct ShpOffsets ShpOffsets;
 typedef struct SlpHeader SlpHeader;
 typedef struct SlpFrame SlpFrame;
 typedef struct SlpTemplate SlpTemplate;
@@ -102,6 +110,35 @@ uchar *getFileContents(const char *path, int *length);
 		exit(1);\
 	}
 
+struct OldDrs
+{
+	OldDrsHeader *header;
+	OldDrsTable *tables;
+	FILE *f;
+};
+
+struct OldDrsHeader
+{
+	char comment[40];
+	int idMin;
+	int idMax;
+	int numFiles;
+};
+
+struct OldDrsTable
+{
+	uint type;
+	int id;
+	int offset;
+};
+
+struct OldDrsFile
+{
+	uint type;
+	int id;
+	int len;
+};
+
 struct DrsHeader
 {
 	char comment[40];
@@ -144,6 +181,36 @@ enum {
 	DrsWav = 0x77617620,	// 'wav '
 };
 
+struct ShpFileHeader
+{
+	char version[4];
+	int numShapes;
+};
+
+struct ShpFrame
+{
+	short bounds_height;
+	short bounds_width;
+	short origin_y;
+	short origin_x;
+	int xmin;
+	int ymin;
+	int xmax;
+	int ymax;
+};
+
+struct ShpOffsets
+{
+	int shapeOff;
+	int palOff;
+};
+
+struct OldShape
+{
+	ShpFileHeader *header;
+	ShpOffsets *offsets;
+};
+
 struct SlpHeader
 {
 	char version[4];
@@ -177,10 +244,14 @@ struct Shape
 
 typedef uchar PixelCB(uchar);
 
+OldShape *OldShapeCreate(uchar *data);
+void OldShapeDrawFrame(ShpFrame *frm, Surface *s, int xoff, int yoff);
+void OldShapeDumpFrame(const char *path, Palette *pal, OldShape *shp, int n, uchar *colmap);
+void OldShapeDrawFrameColorMap(ShpFrame *frm, Surface *s, int xoff, int yoff, uchar *map);
+
 Shape *ShapeCreate(uchar *data);
 Shape *ShapeCreateFromTemplate(SlpTemplate *templ);
 void ShapeDump(Shape *slp);
-//void SlpDrawFrame(Shape *slp, int n, uchar *data, int stride);
 void ShapeDrawFrame(Shape *slp, int n, Surface *s, int x, int y);
 void ShapeDrawArea(Shape *slp, int n, uchar *data, int stride);
 void ShapeDumpFrame(const char *path, Palette *pal, Shape *slp, int n);
@@ -658,7 +729,7 @@ struct View
 	Blendmode blend_modes[9];
 	int baseTileLineWidth[49];
 	int *blendInflBits;
-	char (*blendInflMap)[4];
+	uchar (*blendInflMap)[4];
 	Shape *tmpFlatTile;
 
 	Palette mainPalette;

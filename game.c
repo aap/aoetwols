@@ -64,7 +64,7 @@ mouse(int button, int state, int x, int y)
 	int diffX, diffY;
 	diffX = x - lastMouseX;
 	diffY = y - lastMouseY;
-	if(state & 2){
+	if(state & SDL_BUTTON_MMASK){
 		offx += diffX;
 		offy += diffY;
 	}
