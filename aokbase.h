@@ -86,8 +86,13 @@ struct Palette
 };
 void PaletteMakeGreyscale(Palette *pal);
 void PaletteReadJASC(Palette *pal, FILE *f);
+void PaletteReadJASCFromFile(Palette *pal, char *name);
+void PaletteReadJASCFromString(Palette *pal, char *str);
 void PaletteWriteBmp(Palette *pal, FILE *f);
 uchar PaletteFindColor(Palette *pal, RGB col);
+
+uchar *ColormapRead(const char *filename);
+void PaletteWriteBmpColMap(Palette *pal, FILE *f, uchar *map);
 
 struct Icm
 {
@@ -399,12 +404,12 @@ struct Sprite
 {
 	char filename[13];
 	int resource_id;
-	uchar facet_thing;
+	uchar loaded;
 	Color_Table **color_tables;
-	int facet_thing2;
-	int field_20;
-	int field_24;
-	uchar unk2;
+	Shape *shape;
+	int last_time;
+	int delta_time;
+	uchar color_flag;
 	uchar layer;
 	short color_map;
 	uchar replay;
@@ -423,7 +428,7 @@ struct Sprite
 	uchar sequence_type;
 	short id;
 	uchar mirror_mode;
-	uchar unk3;
+	uchar editor_flag;
 };
 
 struct Tile_Size

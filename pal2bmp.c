@@ -15,7 +15,7 @@ main(int argc, char *argv[])
 		return 1;
 
 	f = fopen(argv[1], "r");
-	if(f == NULL)
+	if(f == nil)
 		return 2;
 	PaletteReadJASC(&pal, f);
 	fclose(f);
@@ -27,9 +27,15 @@ main(int argc, char *argv[])
 		strcat(path, ".bmp");
 		f = fopen(path, "wb");
 	}
-	if(f == NULL)
+	if(f == nil)
 		return 3;
-	PaletteWriteBmp(&pal, f);
+	if (argc < 4)
+		PaletteWriteBmp(&pal, f);
+	else{
+		uchar *map = ColormapRead(argv[3]);
+		PaletteWriteBmpColMap(&pal, f, map);
+		free(map);
+	}
 	fclose(f);
 	return 0;
 }

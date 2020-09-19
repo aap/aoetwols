@@ -1,26 +1,5 @@
 #include "aokbase.h"
 
-uchar*
-ColormapRead(const char *filename)
-{
-	FILE *f;
-	uchar *data;
-
-	f = mustopen(filename, "r");
-	data = malloc(256);
-
-	for (int i = 0; i < 256; i++){
-		int c;
-
-		fscanf(f, "%d\n", &c);
-
-		data[i] = c;
-	}
-
-	fclose(f);
-	return data;
-}
-
 int
 main(int argc, char *argv[])
 {
