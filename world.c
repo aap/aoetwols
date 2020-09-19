@@ -121,9 +121,9 @@ dumpSounds(FILE *f, World *world)
 		for(j = 0; j < world->sounds[i]->num_files; j++){
 			memcpy(filename, s->filename, 13);
 			filename[strlen(filename)-4] = 0;	// remove .wav
-			fprintf(f, "      %s %d %d %d %d\n",
-				filename,
+			fprintf(f, "      %d %s %d %d %d\n",
 				s->res_id,
+				filename,
 				s->probability,
 				s->civilisation,
 				s->playerid);
@@ -188,7 +188,7 @@ dumpSprite(FILE *f, Sprite *spr)
 		spr->num_angles,
 
 		spr->mirror_mode != 0,
-		spr->unk2,
+		spr->color_flag,
 		spr->layer,
 		spr->color_map,
 		!!(spr->sequence_type & 4),
@@ -203,7 +203,7 @@ dumpSprite(FILE *f, Sprite *spr)
 		spr->speed_adjust,
 		spr->duration,
 		spr->replay_delay,
-		spr->unk3,
+		spr->editor_flag,
 		spr->num_hooks,
 		soundid,
 		num_anglesounds		// num sound angles
@@ -221,7 +221,7 @@ dumpSprite(FILE *f, Sprite *spr)
 				soundid = spr->angle_sounds[i].sound[j] ? spr->angle_sounds[i].sound[j]->id : -1;
 				if(soundid < 0)
 					continue;
-				fprintf(f, "    %-7d %-7d %-7d\n", i, soundid, spr->angle_sounds[i].delay[j]);
+				fprintf(f, "    %-7d %-7d %-7d\n", i, spr->angle_sounds[i].delay[j], soundid);
 			}
 		}
 }
@@ -239,38 +239,16 @@ dumpSprites(FILE *f, World *world)
 	for(i = 0; i < world->num_sprites; i++){
 		spr = world->sprites[i];
 		if(spr == nil ||
-		   spr->name[0] == 0 &&
-		   spr->filename[0] == 0 &&
-		   spr->resource_id == 0 &&
-		   spr->frames_per_angle == 0 &&
-		   spr->num_angles == 0 &&
-		   spr->color_map == 0 &&
-		   spr->bounding_box[0] == 0 &&
-		   spr->bounding_box[1] == 0 &&
-		   spr->bounding_box[2] == 0 &&
-		   spr->bounding_box[3] == 0 &&
-		   spr->speed_adjust == 0 &&
-		   spr->duration == 0 &&
-		   spr->replay_delay == 0 &&
-		   spr->num_hooks == 0 &&
-		   spr->facet_thing == 0 &&
-		   spr->facet_thing2 == 0 &&
-		   spr->sound == 0 &&
-		   spr->mirror_mode == 0 &&
-		   spr->unk2 == 0 &&
-		   spr->layer == 0 &&
-		   spr->replay == 0 &&
-		   spr->has_angle_sounds == 0 &&
-		   spr->sequence_type == 0 &&
-		   spr->hooks == 0 &&
-		   spr->angle_sounds == 0 &&
-		   spr->unk3 == 0)
+			spr->resource_id == 0 &&
+			spr->name[0] == 0 &&
+			spr->filename[0] == 0)
 			dowrite[i] = 0;
 		else{
 			dowrite[i] = 1;
 			num_sprites++;
 		}
 	}
+	fprintf(f, "%d\n%d\n", world->num_sprites, num_sprites);
 	for(i = 0; i < world->num_sprites; i++){
 		if(dowrite[i])
 			dumpSprite(f, world->sprites[i]);
@@ -287,8 +265,8 @@ readSprite(Zfile *zf, Sprite *spr, Sound **sounds, Color_Table **coltab)
 	zread(zf, spr->name, 21);
 	zread(zf, spr->filename, 13);
 	zread(zf, &spr->resource_id, 4);
-	zread(zf, &spr->facet_thing, 1);
-	zread(zf, &spr->unk2, 1);
+	zread(zf, &spr->loaded, 1);
+	zread(zf, &spr->color_flag, 1);
 	zread(zf, &spr->layer, 1);
 	zread(zf, &spr->color_map, 2);
 	zread(zf, &spr->replay, 1);
@@ -308,7 +286,7 @@ readSprite(Zfile *zf, Sprite *spr, Sound **sounds, Color_Table **coltab)
 	zread(zf, &spr->id, 2);
 	zread(zf, &spr->mirror_mode, 1);
 	// if version >= 10.72:
-	zread(zf, &spr->unk3, 1);
+	zread(zf, &spr->editor_flag, 1);
 	spr->sound = tmpid >= 0 ? sounds[tmpid] : nil;
 	if(spr->num_hooks > 0){
 		spr->hooks = calloc(spr->num_hooks, sizeof(Sprite_Hook));
@@ -353,7 +331,7 @@ dump_terrain_types(FILE *f, Map *map)
 	char name[13];
 
 	nterr = 0;
-	for(i = 0; i < 42; i++)
+	for(i = 0; i < NUMTERRAINS; i++)
 		if(map->terrain[i].enabled)
 			nterr++;
 	fprintf(f, "%d\n", nterr);
@@ -363,7 +341,7 @@ dump_terrain_types(FILE *f, Map *map)
 			continue;
 		soundid = t->sound ? t->sound->id : -1;
 		nborders = 0;
-		for(j = 0; j < 42; j++)
+		for(j = 0; j < NUMTERRAINS; j++)
 			if(t->borders[j] != 0)
 				nborders++;
 		for(j = 0; j < 13; j++)
