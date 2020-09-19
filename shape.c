@@ -150,7 +150,6 @@ ShapeForallPixels(Shape *slp, PixelCB cb)
 				case 0xB:	/* shadow fill ?? */
 					npx = *cmd++ >> 4;
 					if(npx == 0) npx = *cmd++;
-					cmd++;
 					break;
 				case 0xF:	/* end of line */
 					cmd++;
